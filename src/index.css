@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+.navitem {
+  color: #fff;
+  line-height: 2;
+  position: relative;
+}
+
+.navitem::before {
+  content: '';
+  width: 0;
+  height: 2px;
+  border-radius: 2px;
+  background-color: #fff;
+  position: absolute;
+  bottom: -.25rem;
+  right: 0;
+  transition: right .4s, width .4s, left .4s;
+}
+
+.navitem:hover::before {
+  width: 100%;
+  left: 0;
+}
