@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { signup } from '../userSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { signup, clearError } from '../userSlice';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
@@ -17,42 +17,50 @@ const Signup = () => {
           return;
         }
 
-    dispatch(signup({ email, password }));
+    dispatch(signup({username, email, password}));
+
     navigate('/login');
   };
 
   return (
-    <div className="p-4">
+    <div className='flex'>
+    <form className="max-w-md mx-auto w-full p-8 space-y-8 items-center justify-center" onSubmit={handleSignup}>
       <h1 className="text-2xl font-bold mb-4">Signup</h1>
       <input
         type="text"
         placeholder="Username"
         value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        className="border p-2 mb-2 w-full"
+        onChange={(e) => {dispatch(clearError());
+          setUsername(e.target.value);}}
+        className="h-10 w-full border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-pink-500"
       />
       <input
         type="email"
         placeholder="Email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="border p-2 mb-2 w-full"
+        onChange={(e) => {dispatch(clearError());
+          setEmail(e.target.value);}}
+        className="h-10 w-full border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-pink-500"
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        className="border p-2 mb-4 w-full"
+        onChange={(e) => {dispatch(clearError());
+          setPassword(e.target.value);}}
+        className="h-10 w-full border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-pink-500"
       />
       <input
         type="password"
         placeholder="Confirm Password"
         value={confirmPassword}
         onChange={(e) => setConfirmPassword(e.target.value)}
-        className="border p-2 mb-4 w-full"
+        className="h-10 w-full border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-pink-500"
       />
-      <button onClick={handleSignup} className="bg-pink-600 text-white p-2 rounded">Signup</button>
+      <button type='submit' className="py-2 px-4 bg-pink-500 hover:bg-pink-700 rounded-md shadow-lg font-semibold transition duration-200">Signup</button>
+      <div className="text-gray-500 -mt-5">Already have an account? 
+    <a className="text-blue-400 hover:underline" href="/login"> Log In</a></div>
+    </form>
     </div>
   );
 };
