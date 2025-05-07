@@ -16,12 +16,12 @@ function App() {
     <>
       <NavBar/>
       <Routes>
-        <Route path="/" element={<Home/>}/>
+        <Route path="/home" element={<Home/>}/>
         <Route path="/events" element={<EventList/>}/>
         <Route path="/events/:id" element={<EventDetails/>}/>
         <Route path="/eventregister/:id" element={<EventRegister/>}/>
         <Route path="/signup" element={<Signup/>}/>
-        <Route path="/login" element={<Login/>}/>
+        <Route path="/" element={<Login/>}/>
         <Route path="/create" element={<CreateEvent/>}/>
         <Route path="/edit/:id" element={<EditEvent/>}/>
       </Routes>

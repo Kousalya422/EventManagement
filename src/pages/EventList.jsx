@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import delete_item from '../assets/delete.png';
 import edit_item from '../assets/edit.png';
-import { fetchEvents, deleteEvent } from '../eventSlice';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
+import { fetchEvents, deleteEventAPI } from '../eventSlice';
 
 const EventList = () => {
   const dispatch = useDispatch();
@@ -14,10 +14,12 @@ const EventList = () => {
   }, [dispatch]);
 
   const filteredEvents = items.filter((event) => {
-    const searchInTitle = event.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const searchInVenue = event.venue.toLowerCase().includes(searchTerm.toLowerCase());
-    return searchInTitle || searchInVenue;
-  });
+    const title = event.title || "";
+    const venue = event.venue || "";
+    const search = searchTerm.toLowerCase();
+  
+    return title.toLowerCase().includes(search) || venue.toLowerCase().includes(search);
+  });  
 
   return (
     <div>
@@ -66,12 +68,13 @@ const EventList = () => {
                     </Link>
                   </div>
                   <div>
-                    <button
-                      onClick={() => dispatch(deleteEvent(event.id))}
-                      className="text-red-600"
-                    >
-                        <img src={delete_item} className="px-3"></img>
-                    </button>
+                  <button
+  onClick={() => dispatch(deleteEventAPI(event.id))}
+  className="text-red-600"
+>
+  <img src={delete_item} className="px-3" alt="Delete" />
+</button>
+
                     </div>
                   </div>
                 </div>

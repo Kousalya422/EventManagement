@@ -1,30 +1,30 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { addEvent } from '../eventSlice';
+import { createEvent } from '../eventSlice';
 
 const CreateEvent = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
 const [venue, setVenue] = useState('');
-const [time, setTime] = useState('');
   const [image, setImage] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleSubmit = () => {
-    dispatch(addEvent({ title, description, date, venue,time,image }));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await dispatch(createEvent({ title, description, date, venue, image }));
     navigate('/events');
   };
+  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-        const imageUrl = URL.createObjectURL(file);
-        setImage(imageUrl);
-    }};
-
+      setImage(file);
+    }
+  };  
 
   return (
     <div className="max-w-96 sm:max-w-4xl mx-auto p-8 space-y-6">
@@ -51,13 +51,6 @@ const [time, setTime] = useState('');
   onChange={(e) => setVenue(e.target.value)}
   className="h-[50px] rounded-[5px] text-xs xs:text-sm border border-[#D1D5DB] w-full px-2"
 />
-<input
-        type="time"
-        value={time}
-        onChange={(e) => setTime(e.target.value)}
-        className="h-[50px] rounded-[5px] text-xs xs:text-sm border border-[#D1D5DB] w-full px-2"
-      />
-      
       <div className="mb-4">
         <input
           type="file"
