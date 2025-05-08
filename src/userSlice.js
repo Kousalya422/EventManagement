@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { BASE_URL } from './api';
 
-// Async Thunks
 export const signup = createAsyncThunk('user/signup', async (userData, thunkAPI) => {
   try {
-    const response = await fetch('http://localhost:8000/api/auth/register/', {
+    const response = await fetch(`${BASE_URL}/auth/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
@@ -11,42 +11,46 @@ export const signup = createAsyncThunk('user/signup', async (userData, thunkAPI)
 
     if (!response.ok) {
       const error = await response.json();
-      console.error("Signup error:", error); // 👈 Add this
+      console.error("Signup error:", error);
       return thunkAPI.rejectWithValue(error);
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data; 
   } catch (err) {
-    console.error("Unexpected signup error:", err); // 👈 Add this
-    return thunkAPI.rejectWithValue({ error: 'Unexpected signup error' });
+    console.error("Unexpected signup error:", err);
+    return thunkAPI.rejectWithValue({ message: 'Unexpected signup error' });
   }
 });
 
-
 export const login = createAsyncThunk('user/login', async (credentials, thunkAPI) => {
   try {
-    const response = await fetch('http://localhost:8000/api/auth/login/', {
+    const response = await fetch(`${BASE_URL}/auth/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials),
     });
 
-    // If the response is not OK, handle the error
     if (!response.ok) {
       const error = await response.json();
-      console.log("Login Error:", error); // Log the error response
-      return thunkAPI.rejectWithValue(error); // Send the error to redux
+      console.log("Login Error:", error);
+      return thunkAPI.rejectWithValue(error);
     }
 
-    // Otherwise, return the successful response
-    return await response.json();
+    const data = await response.json();
+    return {
+      user: {
+        ...data.user,
+        role: data.user?.role || data.role,
+      },
+      token: data.token,
+    };
   } catch (error) {
-    console.error("Error during login:", error); // Log any unexpected errors
+    console.error("Error during login:", error);
     return thunkAPI.rejectWithValue({ message: 'Login failed due to an unexpected error.' });
   }
 });
 
-// Load from localStorage
 const loadCurrentUser = () => {
   const user = localStorage.getItem('currentUser');
   return user ? JSON.parse(user) : null;
@@ -59,7 +63,14 @@ const initialState = {
   status: 'idle',
 };
 
-// Slice
+const extractErrorMessage = (errorObj) => {
+  if (typeof errorObj === 'string') return errorObj;
+  if (errorObj.message) return errorObj.message;
+  if (errorObj.detail) return errorObj.detail;
+  if (Array.isArray(errorObj)) return errorObj[0];
+  return 'An error occurred';
+};
+
 const userSlice = createSlice({
   name: 'user',
   initialState,
@@ -67,6 +78,7 @@ const userSlice = createSlice({
     logout: (state) => {
       state.currentUser = null;
       state.token = null;
+      state.status = 'idle';
       localStorage.removeItem('currentUser');
     },
     clearError: (state) => {
@@ -75,29 +87,36 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(signup.fulfilled, (state, action) => {
-        state.currentUser = action.payload.user;
-        state.token = action.payload.token;
+      .addCase(signup.pending, (state) => {
+        state.status = 'loading';
         state.error = null;
-        localStorage.setItem('currentUser', JSON.stringify(action.payload));
+      })
+      .addCase(signup.fulfilled, (state) => {
+        state.status = 'succeeded';
+        state.error = null;
       })
       .addCase(signup.rejected, (state, action) => {
-        // Enhanced error handling
-        state.error = action.payload?.detail || action.payload?.message || 'Signup failed';
+        state.status = 'failed';
+        state.error = extractErrorMessage(action.payload);
+      })
+
+      .addCase(login.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
       })
       .addCase(login.fulfilled, (state, action) => {
+        state.status = 'succeeded';
         state.currentUser = action.payload.user;
         state.token = action.payload.token;
         state.error = null;
         localStorage.setItem('currentUser', JSON.stringify(action.payload));
       })
       .addCase(login.rejected, (state, action) => {
-        // Enhanced error handling
-        state.error = action.payload?.detail || action.payload?.message || 'Login failed';
+        state.status = 'failed';
+        state.error = extractErrorMessage(action.payload);
       });
   },
 });
 
-// Export actions and reducer
 export const { logout, clearError } = userSlice.actions;
 export default userSlice.reducer;

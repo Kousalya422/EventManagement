@@ -9,19 +9,23 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { currentUser, error } = useSelector((state) => state.users);
+  const { currentUser, error, status } = useSelector((state) => state.users);
 
-  // Navigate after successful login
   useEffect(() => {
     if (currentUser) {
-      console.log('Logged in user:', currentUser);
       navigate('/home');
     }
   }, [currentUser, navigate]);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    dispatch(login({ email, password }));
+
+    const result = await dispatch(login({ email, password }));
+
+    if (login.fulfilled.match(result)) {
+      localStorage.setItem('token', result.payload.token); 
+      navigate('/home');
+    }
   };
 
   return (
@@ -31,8 +35,8 @@ const Login = () => {
     >
       <h1 className="text-center text-2xl font-extrabold">Login</h1>
 
-      {error && <p className="text-red-500 mb-2">{error}</p>}
-
+      {error && <p className="text-red-500 mb-2 text-center">{error}</p>}
+      
       <input
         type="email"
         placeholder="Email"
@@ -73,8 +77,9 @@ const Login = () => {
       <button
         type="submit"
         className="w-full py-2 px-4 bg-pink-500 hover:bg-pink-700 rounded-md shadow-lg font-semibold transition duration-200"
+        disabled={status === 'loading'}
       >
-        Login
+        {status === 'loading' ? 'Logging in...' : 'Login'}
       </button>
 
       <div className="text-center text-gray-500">

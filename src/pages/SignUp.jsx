@@ -4,29 +4,31 @@ import { signup, clearError } from '../userSlice';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
-  const [username, setUsername] = useState('');  
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('attendee'); 
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { currentUser, error } = useSelector(state => state.users);
+  const { currentUser, error, status } = useSelector(state => state.users);
 
   const handleSignup = async (e) => {
     e.preventDefault();
-  
+
     if (password !== confirmPassword) {
       alert('Passwords do not match');
       return;
     }
-  
-    const result = await dispatch(signup({ username, email, password }));
-  
+
+    const result = await dispatch(signup({ username, email, password, role }));
+
     if (signup.fulfilled.match(result)) {
-      navigate('/');  
+      navigate('/');
     }
-  };  
+  };
 
   return (
     <div className="flex">
@@ -36,7 +38,7 @@ const Signup = () => {
       >
         <h1 className="text-2xl font-bold mb-4 text-center">Sign Up</h1>
 
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
         <input
           type="text"
@@ -83,16 +85,27 @@ const Signup = () => {
           className="h-10 w-full border-b-2 border-gray-300 bg-transparent focus:outline-none focus:border-pink-500"
         />
 
+        <select
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+          className="w-full border-b-2 border-gray-300 bg-transparent h-10 focus:outline-none focus:border-pink-500"
+        >
+          <option value="attendee">Attendee</option>
+          <option value="organizer">Organizer</option>
+          <option value="admin">Admin</option>
+        </select>
+
         <button
           type="submit"
+          disabled={status === 'loading'}
           className="w-full py-2 px-4 bg-pink-500 hover:bg-pink-700 rounded-md shadow-lg font-semibold transition duration-200"
         >
-          Sign Up
+          {status === 'loading' ? 'Signing Up...' : 'Sign Up'}
         </button>
 
         <div className="text-center text-gray-500">
           Already have an account?
-          <a className="text-blue-400 hover:underline ml-1" href="/login">
+          <a className="text-blue-400 hover:underline ml-1" href="/">
             Log In
           </a>
         </div>

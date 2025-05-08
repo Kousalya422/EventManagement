@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../userSlice";
 import { useNavigate } from "react-router-dom";
+import default_user from '../assets/default_user.png'
 
 const NavBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -33,7 +34,6 @@ const NavBar = () => {
         </div>
       </nav>
 
-      {/* Sidebar */}
       <div className={`fixed top-0 right-0 mt-15 px-5 pt-2 pb-5 rounded-xl w-70 bg-white shadow-lg transform transition-transform duration-300 z-50 ${isSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="flex flex-col items-center">
           <button
@@ -43,7 +43,7 @@ const NavBar = () => {
             &times;
           </button>
 
-          <img className="w-20 h-20 rounded-full object-cover bg-gray-600" alt="Profile" />
+          <img className="w-20 h-20 rounded-full object-cover bg-gray-100" alt="Profile" src={default_user}/>
           <h2 className="text-lg font-semibold mt-2">{currentUser?.user?.username || "Guest"}</h2>
           <p className="text-sm text-gray-500 mt-1">{currentUser?.user?.email || "user@example.com"}</p>
 

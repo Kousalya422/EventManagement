@@ -39,10 +39,7 @@ const EditEvent = () => {
         time,
       };
 
-      // If image is selected, include it in the payload
       if (image) {
-        // You need to update the `updateEvent` thunk to handle FormData if you're passing image.
-        // This just prepares the file for that.
         updatedEvent.image = image;
       }
 
@@ -54,7 +51,7 @@ const EditEvent = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImage(file); // Set actual file, not a URL
+      setImage(file);
     }
   };
 
